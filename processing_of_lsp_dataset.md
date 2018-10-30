@@ -8,26 +8,37 @@
 <li>LSP &amp;&amp; LSP_extended<br>
 这个数据集是由Flickr上‘Volleyball’, ‘Badminton’, ‘Athletics’, ‘Baseball’,  ‘Gymnastics’, ‘Parkour’, ‘Soccer’, ‘Tennis’（原数据集）, ‘parkour’, ‘gymnastics’, and ‘athletics’ （扩展集）等标签所构成。每个图片都由 Amazon Mechanical Turk和类似的途径标注而来，并不高度准确。这些图片被缩放至每个人大约150px长度进行标注，包含了14个节点。<br>
 LSP地址：<a href="http://sam.johnson.io/research/lsp_dataset.zip">http://sam.johnson.io/research/lsp_dataset.zip</a><br>
-LSP样本数：2000个(全身，单人)<br>
+LSP样本数：2000个（全身，单人）<br>
 LSP_extended地址：<a href="http://sam.johnson.io/research/lspet_dataset.zip">http://sam.johnson.io/research/lspet_dataset.zip</a><br>
-LSP_extended样本数：10000个(全身，单人)</li>
+LSP_extended样本数：10000个（全身，单人）</li>
 <li>LSP &amp;&amp; LSP_extended 共12000个标注，节点是以下十四个：<br>
 {1. Right ankle 2. Right knee 3. Right hip 4. Left hip 5. Left knee 6.Left ankle 7.Right wrist <br> 8. Right elbow 9. Right shoulder 10. Left shoulder 11. Left elbow 12. Left wrist 13. Neck 14. Head top}<br><br>
 由于是单人数据集，该数据集的训练难度比多人数据集更简单。</li>
 </ul>
+<h4 id="mpii数据集简介">MPII数据集简介</h4>
+<p>MPII人体姿势数据集是人体姿势预估的一个benchmark，数据集包括了超过40k人的25000张带标注图片，这些图片是从YouTube video中抽取出来的。在测试集中还收录了身体部位遮挡、3D躯干、头部方向的标注。<br>
+MPII地址：<a href="http://human-pose.mpi-inf.mpg.de/#overview">http://human-pose.mpi-inf.mpg.de/#overview</a><br>
+MPII样本数：25000（单人、多人）<br>
+包括以下16类标注： {Head – 0, Neck – 1, Right Shoulder – 2, Right Elbow – 3, Right Wrist – 4,  Left Shoulder – 5, Left Elbow – 6, Left Wrist – 7, Right Hip – 8,  Right Knee – 9, Right Ankle – 10, Left Hip – 11, Left Knee – 12,  Left Ankle – 13, Chest – 14, Background – 15}</p>
 <h4 id="数据集处理">数据集处理</h4>
 <ol>
 <li>matlab格式读入：<br>
 文件joints.mat是MATLAB数据格式，包含了一个以x坐标、y坐标和一个表示关节可见性的二进制数字所构成的3x14x10000的矩阵。<br>
-使用模块scipy.io的函数loadmat和savemat可以实现对mat数据的读写，读入后对原始标注进行转置，转置的目的是分离每个图片的标注</li>
+使用模块scipy.io的函数loadmat和savemat可以实现对mat数据的读写</li>
 </ol>
-<pre class=" language-python"><code class="prism  language-python">    <span class="token keyword">import</span> scipy<span class="token punctuation">.</span>io <span class="token keyword">as</span> sio
-    <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-    data <span class="token operator">=</span> sio<span class="token punctuation">.</span>loadmat<span class="token punctuation">(</span>self<span class="token punctuation">.</span>lsp_anno_path<span class="token punctuation">[</span>count<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    joints <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">'joints'</span><span class="token punctuation">]</span>
-    joints <span class="token operator">=</span> np<span class="token punctuation">.</span>transpose<span class="token punctuation">(</span>joints<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">import</span> scipy<span class="token punctuation">.</span>io <span class="token keyword">as</span> sio
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+data <span class="token operator">=</span> sio<span class="token punctuation">.</span>loadmat<span class="token punctuation">(</span>self<span class="token punctuation">.</span>lsp_anno_path<span class="token punctuation">[</span>count<span class="token punctuation">]</span><span class="token punctuation">)</span>
+joints <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">'joints'</span><span class="token punctuation">]</span>
 </code></pre>
 <ol start="2">
+<li>2 json格式读入<br>
+MPII数据集是以json的格式进行的标注，可以通过json库进行读入</li>
+</ol>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">import</span> json
+anno <span class="token operator">=</span> json<span class="token punctuation">.</span>load<span class="token punctuation">(</span>self<span class="token punctuation">.</span>mpii_anno_pah<span class="token punctuation">)</span>
+</code></pre>
+<ol start="4">
 <li>将每个图片打包成（图片，标注，bounding box）的形式，bounding box即图片大小，其目的是将大小不一的图片处理成256 x 256的大小：</li>
 </ol>
 <pre class=" language-python"><code class="prism  language-python"><span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
@@ -41,9 +52,9 @@ LSP_extended样本数：10000个(全身，单人)</li>
     bbox <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
     joint_dict<span class="token punctuation">[</span>joint_id<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">'imgpath'</span><span class="token punctuation">:</span> im_path<span class="token punctuation">,</span> <span class="token string">'joints'</span><span class="token punctuation">:</span> joint_idd<span class="token punctuation">,</span> <span class="token string">'bbox'</span><span class="token punctuation">:</span> bbox<span class="token punctuation">}</span>
 </code></pre>
-<ol start="3">
+<ol start="5">
 <li>数据增强<br>
-对于lsp数据集，比较重要的就是数据处理，作者用到了几种数据增强的手段</li>
+作者用到了几种数据增强的手段</li>
 </ol>
 <ul>
 <li>缩放 scale</li>
@@ -88,8 +99,9 @@ newimg <span class="token operator">=</span> cv2<span class="token punctuation">
 add <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>rotMat<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> rotMat<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 coor <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>rot<span class="token punctuation">,</span> coor<span class="token punctuation">)</span> <span class="token operator">+</span> w
 </code></pre>
-<p>(3) 翻转<br>
-使用opencv中的flip进行翻转，并对标注点进行处理</p>
+<p><img src="https://ai-studio-static-online.cdn.bcebos.com/4469abf377ef433b967916a955a99d09b1de257d0382401e904bf3e6b622047f" alt="enter image description here"><br>
+(3) 翻转<br>
+使用opencv中的flip进行翻转，并对标注点进行处理。在opencv中flip函数的参数有1水平翻转、0垂直翻转、-1水平垂直翻转三种</p>
 <pre class=" language-python"><code class="prism  language-python"><span class="token keyword">def</span> <span class="token function">flip</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> img<span class="token punctuation">,</span> cod<span class="token punctuation">,</span> anno_valid<span class="token punctuation">,</span> symmetry<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token triple-quoted-string string">'''对图片进行翻转'''</span>
     newimg <span class="token operator">=</span> cv2<span class="token punctuation">.</span>flip<span class="token punctuation">(</span>img<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
@@ -101,8 +113,9 @@ coor <span class="token operator">=</span> np<span class="token punctuation">.</
         label<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>cod<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>cod<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
     train_label<span class="token punctuation">[</span>cnt<span class="token operator">+</span><span class="token operator">+</span><span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>label<span class="token punctuation">)</span>
 </code></pre>
-<p>(4)添加颜色噪声<br>
-我所采用的方法是直接添加10%高斯分布的颜色点作为噪声。(其他方法：添加椒盐噪声、改变图片颜色）</p>
+<p><img src="https://ai-studio-static-online.cdn.bcebos.com/b0369391593d4b599f0687023cb57528f2a728c0e1e84c94978ec3b5d1ba6d24" alt="enter image description here"><br>
+(4)添加颜色噪声<br>
+我所采用的方法是直接添加10%高斯分布的颜色点作为噪声。人为地损失部分通道的信息也可以达到添加彩色噪声的效果。</p>
 <pre class=" language-python"><code class="prism  language-python"><span class="token keyword">def</span> <span class="token function">add_color_noise</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> image<span class="token punctuation">,</span> percentage<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     noise_img <span class="token operator">=</span> image 
     <span class="token triple-quoted-string string">'''产生图像大小10%的随机点'''</span>
@@ -116,6 +129,15 @@ coor <span class="token operator">=</span> np<span class="token punctuation">.</
             noise_img<span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">255</span> <span class="token keyword">if</span> noise_img<span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> ch<span class="token punctuation">]</span> <span class="token operator">&gt;</span> <span class="token number">255</span> <span class="token keyword">else</span> <span class="token number">0</span>
     <span class="token keyword">return</span> noise_img
 </code></pre>
+<p><img src="https://ai-studio-static-online.cdn.bcebos.com/0b3f37cc24384dceb920942b88e0c799706e6ab80ed14cec8b7df3e791d98342" alt="enter image description here"><br>
+(4)除此之外，以下数据增强的方法也很常见：</p>
+<ul>
+<li>从颜色上考虑，还可以做图像亮度、饱和度、对比度变化、PCA Jittering（按照RGB三个颜色通道计算均值和标准差后在整个训练集上计算协方差矩阵，进行特征分解，得到特征向量和特征值）</li>
+<li>从图像空间性质上考虑，还可以使用随机裁剪、平移</li>
+<li>从噪声角度，高斯噪声、椒盐噪声、模糊处理；</li>
+<li>从类别分布的角度，可以采用label shuffle、Supervised Data Augmentation（海康威视ILSVRC2016的report）<br>
+在这个具体例子中，进行数据增强的时候要考虑的是（1）形变会不会影响结果（2）会不会丢掉部分节点</li>
+</ul>
 <h4 id="制作paddle数据">制作paddle数据</h4>
 <p>使用paddle.batch批量读入数据，并制作成paddle的数据格式</p>
 <pre class=" language-python"><code class="prism  language-python">reader <span class="token operator">=</span> paddle<span class="token punctuation">.</span>batch<span class="token punctuation">(</span>self<span class="token punctuation">.</span>read_record<span class="token punctuation">(</span>test_list<span class="token punctuation">,</span> joint_dict<span class="token punctuation">,</span> 
@@ -129,4 +151,6 @@ PCK：检测的关键点与其对应的groundtruth之间的归一化距离小于
 在本篇论文中，作者将图片中心作为身体的位置，并以图片大小作为衡量身体尺寸的标准。<br>
 PCK@0.2 on LSP &amp;&amp; LSP-extended：以驱干直径为归一化标准<br>
 PCKh@0.5 on MPII：以头部为归一化标准</p>
+<h4 id="关于训练的过拟合抢救">关于训练的过拟合抢救</h4>
+<p>对于容易过拟合的数据，数据增强是比较重要的，训练的时候学习率需要不能太大，当一次训练过拟合后，可以从loss曲线波动的地方回溯到较为平稳的点，并以平稳点的学习率为起点，以更低的学习率接上上次学习。</p>
 
