@@ -117,7 +117,7 @@ coor <span class="token operator">=</span> np<span class="token punctuation">.</
     <span class="token keyword">return</span> noise_img
 </code></pre>
 <h4 id="制作paddle数据">制作paddle数据</h4>
-<p>使用paddle.batch批量读入数据，并知错成paddle的数据格式</p>
+<p>使用paddle.batch批量读入数据，并制作成paddle的数据格式</p>
 <pre class=" language-python"><code class="prism  language-python">reader <span class="token operator">=</span> paddle<span class="token punctuation">.</span>batch<span class="token punctuation">(</span>self<span class="token punctuation">.</span>read_record<span class="token punctuation">(</span>test_list<span class="token punctuation">,</span> joint_dict<span class="token punctuation">,</span> 
 				mode <span class="token operator">=</span> <span class="token string">'train'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
 fluid<span class="token punctuation">.</span>recordio_writer<span class="token punctuation">.</span>convert_reader_to_recordio_file<span class="token punctuation">(</span><span class="token string">"./work/test_"</span>  <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"_test.recordio"</span><span class="token punctuation">,</span> 
