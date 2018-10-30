@@ -6,7 +6,7 @@
 <h4 id="lsp数据集简介">LSP数据集简介</h4>
 <ul>
 <li>LSP &amp;&amp; LSP_extended<br>
-这个数据集是由Flickr上搜索’parkour’, ‘gymnastics’, and ‘athletics’ 等标签，加上人体姿势预估challenge所构成。每个图片都由 Amazon Mechanical Turk和类似的途径标注而来，并不是高度准确。这些图片被缩放至每个人大约150px长度进行标注，包含了14个节点。<br>
+这个数据集是由Flickr上‘Volleyball’, ‘Badminton’, ‘Athletics’, ‘Baseball’,  ‘Gymnastics’, ‘Parkour’, ‘Soccer’, ‘Tennis’（原数据集）, ‘parkour’, ‘gymnastics’, and ‘athletics’ （扩展集）等标签所构成。每个图片都由 Amazon Mechanical Turk和类似的途径标注而来，并不高度准确。这些图片被缩放至每个人大约150px长度进行标注，包含了14个节点。<br>
 LSP地址：<a href="http://sam.johnson.io/research/lsp_dataset.zip">http://sam.johnson.io/research/lsp_dataset.zip</a><br>
 LSP样本数：2000个(全身，单人)<br>
 LSP_extended地址：<a href="http://sam.johnson.io/research/lspet_dataset.zip">http://sam.johnson.io/research/lspet_dataset.zip</a><br>
